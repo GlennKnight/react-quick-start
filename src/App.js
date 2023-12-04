@@ -19,7 +19,7 @@ function Board({ xIsNext, squares, onPlay }) {
     } else {
       nextSquares[i] = 'O';
     }
-    onPlay(nextSquares);
+    onPlay(nextSquares, i);
   }
 
   const { winner, line } = calculateWinner(squares);
@@ -52,14 +52,16 @@ function Board({ xIsNext, squares, onPlay }) {
 }
 
 export default function Game() {
-  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [history, setHistory] = useState([{ squares: Array(9).fill(null), location: null }]);
   const [currentMove, setCurrentMove] = useState(0);
   const [descending, setDescending] = useState(true);
   const xIsNext = currentMove % 2 === 0;
-  const currentSquares = history[currentMove];
+  const currentSquares = history[currentMove].squares;
 
-  function handlePlay(nextSquares) {
-    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+  function handlePlay(nextSquares, index) {
+    const row = Math.floor(index / 3) + 1;
+    const col = (index % 3) + 1;
+    const nextHistory = [...history.slice(0, currentMove + 1), { squares: nextSquares, location: { row, col } }];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
   }
@@ -68,16 +70,16 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
 
-  const moves = history.map((squares, move) => {
+  const moves = history.map(({ squares, location }, move) => {
     const bIsCurrentMove = move === currentMove;
     const description = bIsCurrentMove
       ? `You are at move #${move}`
       : move > 0
         ? `Go to move #${move}`
         : 'Go to game start';
-
+    const coords = location ? ` (${location.row},${location.col})` : null;
     const item = bIsCurrentMove
-      ? <span>{description}</span>
+      ? <span>{description}{coords}</span>
       : <button onClick={() => jumpTo(move)}>{description}</button>;
 
     return (
