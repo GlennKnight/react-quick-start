@@ -30,24 +30,20 @@ function Board({ xIsNext, squares, onPlay }) {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O');
   }
 
+  const board = [];
+  for (let ixRow = 0; ixRow < 3; ixRow++) {
+    const row = [];
+    for (let ixCol = 0; ixCol < 3; ixCol++) {
+      const ix = 3 * ixRow + ixCol;
+      row.push(<Square key={ix} value={squares[ix]} onSquareClick={() => handleClick(ix)} />);
+    }
+    board.push(<div key={ixRow} className="board-row">{row}</div>);
+  }
+
   return (
     <>
       <div className="status">{status}</div>
-      <div className="board-row">
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
-      </div>
+      {board}
     </>
   );
 }
@@ -71,14 +67,14 @@ export default function Game() {
   const moves = history.map((squares, move) => {
     const bIsCurrentMove = move === currentMove;
     const description = bIsCurrentMove
-    ? `You are at move #${move}`
-    : move > 0
-      ? `Go to move #${move}`
-      : 'Go to game start';
+      ? `You are at move #${move}`
+      : move > 0
+        ? `Go to move #${move}`
+        : 'Go to game start';
 
-  const item = bIsCurrentMove
-    ? <span>{description}</span>
-    : <button onClick={() => jumpTo(move)}>{description}</button>;
+    const item = bIsCurrentMove
+      ? <span>{description}</span>
+      : <button onClick={() => jumpTo(move)}>{description}</button>;
 
     return (
       <li key={move}>
